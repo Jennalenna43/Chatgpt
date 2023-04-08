@@ -1,66 +1,84 @@
 <!DOCTYPE html>
-<html>
-  <head>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
-    <title>ChatGPT</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-      // Replace YOUR_API_KEY with your actual OpenAI API key
-      var apiKey = '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';
-      // Replace ENGINE_ID with 'davinci' for GPT-3's most powerful version
-      var engineId = 'davinci';
-
-      $(document).ready(function() {
-        // Send a message to the GPT-3 language model
-        function sendMessage(message) {
-          $.ajax({
-            type: 'POST',
-            url: 'https://api.openai.com/v1/engines/' + engineId + '/completions',
-            headers: {
-              'Authorization': 'Bearer ' + apiKey,
-              'Content-Type': 'application/json'
-            },
-            data: JSON.stringify({
-              'prompt': message,
-              'max_tokens': 50,
-              'temperature': 0.5,
-              'n': 1,
-              'stop': '\n'
-            }),
-            success: function(response) {
-              // Display the response from the GPT-3 language model
-              var chatbotOutput = $('#chatbot-output');
-              chatbotOutput.append('<p><strong>ChatGPT:</strong> ' + response.choices[0].text + '</p>');
-            },
-            error: function(xhr, status, error) {
-              console.error('Error sending message to ChatGPT: ' + error);
-            }
-          });
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatGPT Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
         }
+        #chat-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        #messages {
+            overflow-y: scroll;
+            flex-grow: 1;
+            padding: 10px;
+        }
+        #chat-form {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+        }
+        #user-input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div id="chat-container">
+        <div id="messages">
+        </div>
+        <form id="chat-form">
+            <input type="text" id="user-input" placeholder="Type your message..." autocomplete="off">
+            <button type="submit">Send</button>
+        </form>
+    </div>
+    <script>
+        const API_KEY = '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'; // Replace with your actual API key
+        const API_URL = 'https://api.openai.com/v1/engines/davinci-codex/completions';
 
-        // Get the message input element
-        var messageInput = $('#message-input');
+        const chatForm = document.getElementById('chat-form');
+        const messages = document.getElementById('messages');
+        const userInput = document.getElementById('user-input');
 
-        // Set up an event listener for the message input form submission
-        $('#message-form').submit(function(event) {
-          // Prevent the default form submission behavior
-          event.preventDefault();
-          // Get the user's message
-          var message = messageInput.val();
-          // Clear the message input
-          messageInput.val('');
-          // Send the message to the GPT-3 language model
-          sendMessage(message);
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const userMessage = userInput.value;
+            userInput.value = '';
+
+            messages.innerHTML += `<div>${userMessage}</div>`;
+
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${API_KEY}`,
+                },
+                body: JSON.stringify({
+                    prompt: userMessage,
+                    max_tokens: 50,
+                    temperature: 0.7,
+                    top_p: 1,
+                    frequency_penalty: 0,
+                    presence_penalty: 0,
+                }),
+            });
+
+            const data = await response.json();
+            const chatGptResponse = data.choices[0].text.trim();
+            messages.innerHTML += `<div>${chatGptResponse}</div>`;
         });
-      });
     </script>
-  </head>
-  <body>
-    <h1>ChatGPT</h1>
-    <div id="chatbot-output"></div>
-    <form id="message-form">
-      <input id="message-input" type="text" placeholder="Type your message here">
-      <button type="submit">Send</button>
-    </form>
-  </body>
+</body>
 </html>
