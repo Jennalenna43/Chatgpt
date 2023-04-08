@@ -20,6 +20,14 @@
             flex-grow: 1;
             padding: 10px;
         }
+        .user-message {
+            text-align: right;
+            font-weight: bold;
+        }
+        .chatgpt-response {
+            text-align: left;
+            color: #008000;
+        }
         #chat-form {
             display: flex;
             justify-content: space-between;
@@ -57,7 +65,7 @@
             const userMessage = userInput.value;
             userInput.value = '';
 
-            messages.innerHTML += `<div>${userMessage}</div>`;
+            messages.innerHTML += `<div class="user-message">${userMessage}</div>`;
 
             const response = await fetch(API_URL, {
                 method: 'POST',
@@ -77,7 +85,7 @@
 
             const data = await response.json();
             const chatGptResponse = data.choices[0].text.trim();
-            messages.innerHTML += `<div>${chatGptResponse}</div>`;
+            messages.innerHTML += `<div class="chatgpt-response">${chatGptResponse}</div>`;
         });
     </script>
 </body>
