@@ -29,9 +29,8 @@
             }),
             success: function(response) {
               // Display the response from the GPT-3 language model
-              var chatbot = $('#chatbot');
-              chatbot.append('<p><strong>You:</strong> ' + message + '</p>');
-              chatbot.append('<p><strong>ChatGPT:</strong> ' + response.choices[0].text + '</p>');
+              var chatbotOutput = $('#chatbot-output');
+              chatbotOutput.append('<p><strong>ChatGPT:</strong> ' + response.choices[0].text + '</p>');
             },
             error: function(xhr, status, error) {
               console.error('Error sending message to ChatGPT: ' + error);
@@ -39,15 +38,29 @@
           });
         }
 
-        // Display a prompt for the user to enter a message
-        var message = prompt('Enter your message:');
-        // Send the message to the GPT-3 language model
-        sendMessage(message);
+        // Get the message input element
+        var messageInput = $('#message-input');
+
+        // Set up an event listener for the message input form submission
+        $('#message-form').submit(function(event) {
+          // Prevent the default form submission behavior
+          event.preventDefault();
+          // Get the user's message
+          var message = messageInput.val();
+          // Clear the message input
+          messageInput.val('');
+          // Send the message to the GPT-3 language model
+          sendMessage(message);
+        });
       });
     </script>
   </head>
   <body>
     <h1>ChatGPT</h1>
-    <div id="chatbot"></div>
+    <div id="chatbot-output"></div>
+    <form id="message-form">
+      <input id="message-input" type="text" placeholder="Type your message here">
+      <button type="submit">Send</button>
+    </form>
   </body>
 </html>
